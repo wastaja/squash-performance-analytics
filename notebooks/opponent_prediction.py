@@ -5,16 +5,16 @@ pd.set_option('display.max_columns', None)
 
 selected_opponent = input("Enter opponent name: ")
 
-con = duckdb.connect()
+con = duckdb.connect("data/squash.db")
 
 # raw
 con.execute("""
     create or replace view matches as
-    select * from read_csv_auto('../data/matches.csv')
+    select * from read_csv_auto('data/matches.csv')
 """)
 
 # staging
-with open('../sql/staging/stg_matches.sql', 'r') as f:
+with open('sql/staging/stg_matches.sql', 'r') as f:
     staging_query = f.read()
 
 con.execute(f"""
@@ -23,7 +23,7 @@ con.execute(f"""
 """)
 
 # marts
-with open('../sql/marts/fact_matches.sql', 'r') as f:
+with open('sql/marts/fact_matches.sql', 'r') as f:
     fact_query = f.read()
 
 con.execute(f"""
@@ -32,7 +32,7 @@ con.execute(f"""
 """)
 
 # prediction components
-with open('../sql/analysis/opponent_prediction_components.sql', 'r') as f:
+with open('sql/analysis/opponent_prediction_components.sql', 'r') as f:
     components_query = f.read()
 
 components_df = con.execute(components_query).df()
@@ -68,7 +68,7 @@ else:
     print("\nPrediction:\n")
     print(f"Opponent: {selected_opponent}")
     print(f"Win probability score: {round(prediction_score, 2)}")
-    
+
     if prediction_score >= 0.65:
         interpretation = "High chance of winning"
     elif prediction_score >= 0.45:

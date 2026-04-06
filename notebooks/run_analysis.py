@@ -1,6 +1,6 @@
 import duckdb
 
-con = duckdb.connect()
+con = duckdb.connect("../data/squash.db")
 
 # raw
 con.execute("""
